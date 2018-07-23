@@ -26,11 +26,17 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
+    //ExifInterface
+    implementation 'com.android.support:exifinterface:27.1.1'
+
     //RecyclerView
     implementation 'com.android.support:recyclerview-v7:27.1.1'
 
     //Retrofit
-    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    compile 'com.squareup.retrofit2:retrofit:2.4.0'
+    compile 'com.google.code.gson:gson:2.8.5'
+    compile 'com.squareup.retrofit2:converter-gson:2.4.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.9.1'
     //Piccasso
     implementation 'com.squareup.picasso:picasso:2.71828'
     //Butterknife
