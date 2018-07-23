@@ -3,14 +3,19 @@ package com.fancystachestudios.bakingapp.bakingapp;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import com.fancystachestudios.bakingapp.bakingapp.adapters.RecipeAdapter;
 import com.fancystachestudios.bakingapp.bakingapp.customClasses.Recipe;
 import com.fancystachestudios.bakingapp.bakingapp.network.APIClient;
 import com.fancystachestudios.bakingapp.bakingapp.network.APIInterface;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -26,19 +31,36 @@ import retrofit2.Response;
  *
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RecipeAdapter.RecipeClickListener{
+
+    @BindView(R.id.recipe_recyclerview)
+    RecyclerView recipeRecyclerview;
 
     APIInterface apiInterface;
-    ArrayList<Recipe> recipies = new ArrayList<>();
+    ArrayList<Recipe> recipes = new ArrayList<>();
+    RecipeAdapter.RecipeClickListener recipeClickListener;
+    RecipeAdapter recipeAdapter;
+    GridLayoutManager gridLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         apiInterface = APIClient.getClient().create(APIInterface.class);
+        Log.d("naputest", "1");
 
         getJson();
+        Log.d("naputest", "3");
+
+        recipeClickListener = this;
+        recipeAdapter = new RecipeAdapter(this, recipes, recipeClickListener);
+        recipeRecyclerview.setAdapter(recipeAdapter);
+
+        gridLayoutManager = new GridLayoutManager(this, 1);
+        recipeRecyclerview.setLayoutManager(gridLayoutManager);
+
     }
 
     private void getJson(){
@@ -47,7 +69,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ArrayList<Recipe>> call, Response<ArrayList<Recipe>> response) {
                 Log.d("napuResponse", "onResponse");
-                recipies.addAll(response.body());
+                recipes.addAll(response.body());
+                recipeAdapter.setDataset(recipes);
+                Log.d("naputest", "2");
             }
 
             @Override
@@ -59,4 +83,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onRecipeClick(int clickedItemIndex) {
+
+    }
 }
