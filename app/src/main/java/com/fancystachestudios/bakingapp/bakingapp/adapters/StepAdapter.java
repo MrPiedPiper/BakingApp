@@ -1,6 +1,7 @@
 package com.fancystachestudios.bakingapp.bakingapp.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -55,7 +56,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.ViewHolder> {
             holder.stepName.setText("Ingredients");
         }else{
         Step currStep = steps.get(position - 1);
-        holder.stepName.setText(position + ": " + currStep.getShortDescription());
+        holder.stepName.setText(context.getString(R.string.step_name, position, currStep.getShortDescription()));
     }
     }
 
