@@ -14,4 +14,10 @@
     <string name="ingredient_one_or_less">%1$s %2$s of %3$s</string>
     <string name="ingredient_other">%1$s %2$ss of %3$s</string>
 
+    <!--String used as a key when passing the current index to StepActivity-->
+    <string name="step_number_key">stepNumber</string>
+
+    <string name="step_next_button">Next</string>
+    <string name="step_prev_button">Prev</string>
+
 </resources>

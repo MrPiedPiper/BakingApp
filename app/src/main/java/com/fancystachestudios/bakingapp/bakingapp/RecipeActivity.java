@@ -52,13 +52,13 @@ public class RecipeActivity extends AppCompatActivity implements StepAdapter.Ste
     @Override
     public void onStepClick(int clickedItemIndex) {
         Intent intent;
-        intent = new Intent(this, IngredientActivity.class);
-        /*if(clickedItemIndex == 0){
+        if(clickedItemIndex == 0){
             intent = new Intent(this, IngredientActivity.class);
         }else{
-            //intent = new Intent(this, StepActivity.class);
-        }*/
+            intent = new Intent(this, StepActivity.class);
+        }
         intent.putExtra(getString(R.string.recipe_pass_key), recipe);
+        intent.putExtra(getString(R.string.step_number_key), clickedItemIndex);
         startActivity(intent);
     }
 }
