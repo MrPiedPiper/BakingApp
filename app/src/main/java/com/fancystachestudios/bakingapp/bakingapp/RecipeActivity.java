@@ -5,8 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.fancystachestudios.bakingapp.bakingapp.adapters.StepAdapter;
@@ -34,7 +32,7 @@ public class RecipeActivity extends AppCompatActivity implements StepAdapter.Ste
         ButterKnife.bind(this);
 
         Intent startingIntent = getIntent();
-        recipe = startingIntent.getParcelableExtra(getString(R.string.recipe_to_steps_key));
+        recipe = startingIntent.getParcelableExtra(getString(R.string.recipe_pass_key));
 
         if(recipe == null || recipe.getSteps().size() == 0) {
             Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
@@ -53,6 +51,14 @@ public class RecipeActivity extends AppCompatActivity implements StepAdapter.Ste
 
     @Override
     public void onStepClick(int clickedItemIndex) {
-
+        Intent intent;
+        intent = new Intent(this, IngredientActivity.class);
+        /*if(clickedItemIndex == 0){
+            intent = new Intent(this, IngredientActivity.class);
+        }else{
+            //intent = new Intent(this, StepActivity.class);
+        }*/
+        intent.putExtra(getString(R.string.recipe_pass_key), recipe);
+        startActivity(intent);
     }
 }

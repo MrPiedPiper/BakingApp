@@ -4,8 +4,14 @@
     <!--Recipe ListView item strings -->
     <string name="recipe_item_image_content_description">Finished dish picture</string>
 
-    <string name="recipe_to_steps_key">steps</string>
+    <!--String used as a key when passing the current Recipe to other activities-->
+    <string name="recipe_pass_key">currRecipe</string>
 
     <!--Step name string-->
     <string name="step_name">%1$d: %2$s</string>
+
+    <!--Strings for the ingredients. e.g. 1 CUP of milk. 2 TBLSPs of vanilla extract-->
+    <string name="ingredient_one_or_less">%1$s %2$s of %3$s</string>
+    <string name="ingredient_other">%1$s %2$ss of %3$s</string>
+
 </resources>

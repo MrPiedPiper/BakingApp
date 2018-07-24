@@ -1,7 +1,6 @@
 package com.fancystachestudios.bakingapp.bakingapp.adapters;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -43,7 +42,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.ViewHolder> {
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.step_item, parent, false);
+                .inflate(R.layout.textview_item, parent, false);
 
         ViewHolder vh = new ViewHolder(v);
         return vh;
@@ -67,7 +66,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.ViewHolder> {
 
     public class ViewHolder  extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        @BindView(R.id.step_item_name)
+        @BindView(R.id.textview_item_text)
         TextView stepName;
 
         ViewHolder(View itemView) {

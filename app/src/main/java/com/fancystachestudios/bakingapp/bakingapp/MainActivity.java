@@ -1,7 +1,6 @@
 package com.fancystachestudios.bakingapp.bakingapp;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -82,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
     @Override
     public void onRecipeClick(int clickedItemIndex) {
         Intent stepsIntent = new Intent(this, RecipeActivity.class);
-        stepsIntent.putExtra(getString(R.string.recipe_to_steps_key), recipes.get(clickedItemIndex));
+        stepsIntent.putExtra(getString(R.string.recipe_pass_key), recipes.get(clickedItemIndex));
 
         startActivity(stepsIntent);
     }

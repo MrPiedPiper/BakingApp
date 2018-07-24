@@ -4,11 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:context=".IngredientActivity"
     tools:listitem="@layout/textview_item"
-    tools:context=".RecipeActivity"
+    android:id="@+id/ingredient_recyclerview"
     android:background="@color/colorPrimaryDark"
-    android:padding="8dp"
-    android:id="@+id/step_layout"
-    >
+    android:padding="8dp">
 
 </android.support.v7.widget.RecyclerView>
