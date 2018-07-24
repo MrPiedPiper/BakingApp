@@ -7,7 +7,7 @@
     tools:listitem="@layout/step_item"
     tools:context=".RecipeActivity"
     android:background="@color/colorPrimaryDark"
-    android:padding="24dp"
+    android:padding="8dp"
     android:id="@+id/step_layout"
     >
 
