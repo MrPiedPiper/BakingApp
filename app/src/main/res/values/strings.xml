@@ -3,4 +3,6 @@
 
     <!--Recipe ListView item strings -->
     <string name="recipe_item_image_content_description">Finished dish picture</string>
+
+    <string name="recipe_to_steps_key">steps</string>
 </resources>

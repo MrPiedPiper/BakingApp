@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:listitem="@layout/step_item"
+    tools:context=".RecipeActivity"
+    android:background="@color/colorPrimaryDark"
+    android:padding="24dp"
+    android:id="@+id/step_layout"
+    >
+
+</android.support.v7.widget.RecyclerView>

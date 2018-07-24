@@ -1,5 +1,6 @@
 package com.fancystachestudios.bakingapp.bakingapp;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -49,10 +50,7 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         ButterKnife.bind(this);
 
         apiInterface = APIClient.getClient().create(APIInterface.class);
-        Log.d("naputest", "1");
-
         getJson();
-        Log.d("naputest", "3");
 
         recipeClickListener = this;
         recipeAdapter = new RecipeAdapter(this, recipes, recipeClickListener);
@@ -68,10 +66,8 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         call.enqueue(new Callback<ArrayList<Recipe>>() {
             @Override
             public void onResponse(Call<ArrayList<Recipe>> call, Response<ArrayList<Recipe>> response) {
-                Log.d("napuResponse", "onResponse");
                 recipes.addAll(response.body());
                 recipeAdapter.setDataset(recipes);
-                Log.d("naputest", "2");
             }
 
             @Override
@@ -85,6 +81,9 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
 
     @Override
     public void onRecipeClick(int clickedItemIndex) {
+        Intent stepsIntent = new Intent(this, RecipeActivity.class);
+        stepsIntent.putExtra(getString(R.string.recipe_to_steps_key), recipes.get(clickedItemIndex));
 
+        startActivity(stepsIntent);
     }
 }
