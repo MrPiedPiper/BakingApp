@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,8 +58,6 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
     Context context;
 
-    //@BindView(R.id.step_player_layout)
-    //FrameLayout playerLayout;
     @BindView(R.id.step_player)
     SimpleExoPlayerView mPlayerView;
     @BindView(R.id.step_details)
@@ -110,7 +109,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Log.d("naputest", "created");
         context = getContext();
 
         if (getArguments() != null) {
@@ -122,12 +121,9 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_step, container, false);
+        // Inflate the layout for this fragmen
+        final View rootView = inflater.inflate(R.layout.fragment_step, container, false);
         ButterKnife.bind(this, rootView);
-
-        //playerLayout.setAspectRatio(((float)16/9));
-        //playerLayout.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
 
         currStep = recipe.getSteps().get(stepIndex);
         stepDetails.setText(currStep.getDescription());
@@ -136,7 +132,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
         initializePlayer(Uri.parse(currStep.getVideoURL()));
 
-        return inflater.inflate(R.layout.fragment_step, container, false);
+        return rootView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
