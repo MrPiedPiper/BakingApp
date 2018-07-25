@@ -28,6 +28,8 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
     FrameLayout stepContainer;
 
     StepFragment stepFragment;
+    MasterRecipeFragment masterRecipeFragment;
+    IngredientsFragment ingredientsFragment;
 
     Recipe recipe;
     int stepIndex;
@@ -63,7 +65,7 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
-        MasterRecipeFragment masterRecipeFragment = new MasterRecipeFragment();
+        masterRecipeFragment = new MasterRecipeFragment();
         masterRecipeFragment.setRecipe(recipe);
         fragmentManager.beginTransaction()
                 .add(R.id.master_fragment_container, masterRecipeFragment)
@@ -71,12 +73,21 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
 
         if(isSplitScreen){
             stepFragment = new StepFragment();
-            Log.d("naputest", "setting recipe to "+recipe.getName());
             stepFragment.setRecipe(recipe);
-            stepFragment.setStepIndex(stepIndex);
-            fragmentManager.beginTransaction()
-                    .add(stepContainer.getId(), stepFragment)
-                    .commit();
+
+            ingredientsFragment = new IngredientsFragment();
+            ingredientsFragment.setRecipe(recipe);
+
+            if(stepIndex == 0){
+                fragmentManager.beginTransaction()
+                        .add(stepContainer.getId(), ingredientsFragment)
+                        .commit();
+            }else{
+                stepFragment.setStepIndex(stepIndex-1);
+                fragmentManager.beginTransaction()
+                        .add(stepContainer.getId(), stepFragment)
+                        .commit();
+            }
         }
     }
 
@@ -85,7 +96,22 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
     public void stepChosen(int stepIndex) {
         this.stepIndex = stepIndex;
         if(isSplitScreen){
-            stepFragment.setStepIndex(stepIndex - 1);
+            if (stepIndex == 0){
+                if(findViewById(R.id.step_details) != null){
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(stepContainer.getId(), ingredientsFragment)
+                            .commit();
+                }
+            }else{
+                if(findViewById(R.id.step_details) == null){
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(stepContainer.getId(), stepFragment)
+                            .commit();
+                }
+                stepFragment.setStepIndex(stepIndex - 1);
+            }
         }else{
             Intent intent;
             if (stepIndex == 0) {

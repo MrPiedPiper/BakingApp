@@ -132,7 +132,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
     private void updateLayout(){
         if(mExoPlayer != null) releasePlayer();
-
+        Toast.makeText(context, "updated", Toast.LENGTH_SHORT);
         currStep = recipe.getSteps().get(stepIndex);
         stepDetails.setText(currStep.getDescription());
 
