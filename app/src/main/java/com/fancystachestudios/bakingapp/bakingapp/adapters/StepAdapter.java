@@ -53,10 +53,13 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.ViewHolder> {
 
         if(position == 0){
             holder.stepName.setText("Ingredients");
+        }else if(position == 1){
+            Step currStep = steps.get(position - 1);
+            holder.stepName.setText(currStep.getDescription());
         }else{
-        Step currStep = steps.get(position - 1);
-        holder.stepName.setText(context.getString(R.string.step_name, position, currStep.getShortDescription()));
-    }
+            Step currStep = steps.get(position - 1);
+            holder.stepName.setText(context.getString(R.string.step_name, position - 1, currStep.getShortDescription()));
+        }
     }
 
     @Override

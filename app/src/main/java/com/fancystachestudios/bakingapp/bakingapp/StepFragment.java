@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -62,6 +63,10 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     SimpleExoPlayerView mPlayerView;
     @BindView(R.id.step_details)
     TextView stepDetails;
+    @BindView(R.id.step_prev_button)
+    Button stepPrev;
+    @BindView(R.id.step_next_button)
+    Button stepNext;
 
     Recipe recipe;
     int stepIndex;
@@ -109,8 +114,6 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("naputest", "created");
-        context = getContext();
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -121,9 +124,55 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragmen
+        // Inflate the layout for this fragment
         final View rootView = inflater.inflate(R.layout.fragment_step, container, false);
         ButterKnife.bind(this, rootView);
+
+        buttonEnableCheck();
+
+        stepPrev.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                if(stepIndex != 0){
+                    stepIndex--;
+                    updateLayout();
+                }
+                buttonEnableCheck();
+            }
+        });
+
+        stepNext.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                if(stepIndex < recipe.getSteps().size() - 1){
+                    stepIndex++;
+                    updateLayout();
+                }
+                buttonEnableCheck();
+            }
+        });
+
+        updateLayout();
+
+        return rootView;
+    }
+
+    private void buttonEnableCheck(){
+        if(stepIndex == 0){
+            stepPrev.setEnabled(false);
+        }else{
+            stepPrev.setEnabled(true);
+        }
+
+        if(stepIndex == recipe.getSteps().size() - 1){
+            stepNext.setEnabled(false);
+        }else{
+            stepNext.setEnabled(true);
+        }
+    }
+
+    private void updateLayout(){
+        if(mExoPlayer != null) releasePlayer();
 
         currStep = recipe.getSteps().get(stepIndex);
         stepDetails.setText(currStep.getDescription());
@@ -132,8 +181,9 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
         initializePlayer(Uri.parse(currStep.getVideoURL()));
 
-        return rootView;
     }
+
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -145,6 +195,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        this.context = context;
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
