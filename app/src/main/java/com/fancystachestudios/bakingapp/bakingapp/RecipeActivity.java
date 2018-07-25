@@ -2,12 +2,14 @@ package com.fancystachestudios.bakingapp.bakingapp;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -28,6 +30,7 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
     StepFragment stepFragment;
 
     Recipe recipe;
+    int stepIndex;
 
     boolean isSplitScreen = false;
 
@@ -41,11 +44,20 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
             isSplitScreen = true;
         }
 
-        Intent startingIntent = getIntent();
-        recipe = startingIntent.getParcelableExtra(getString(R.string.recipe_pass_key));
+        if(savedInstanceState != null){
+            Recipe savedRecipe = savedInstanceState.getParcelable(getString(R.string.step_recipe_key));
+            int savedIndex = savedInstanceState.getInt(getString(R.string.step_index_key));
+            if(isSplitScreen) {
+                recipe = savedRecipe;
+                stepIndex = savedIndex;
+            }
+        }else{
+            Intent startingIntent = getIntent();
+            recipe = startingIntent.getParcelableExtra(getString(R.string.recipe_pass_key));
+        }
 
         if(recipe == null || recipe.getSteps().size() == 0) {
-            Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Something went wrong! (RecipeActivity)", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -59,7 +71,9 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
 
         if(isSplitScreen){
             stepFragment = new StepFragment();
+            Log.d("naputest", "setting recipe to "+recipe.getName());
             stepFragment.setRecipe(recipe);
+            stepFragment.setStepIndex(stepIndex);
             fragmentManager.beginTransaction()
                     .add(stepContainer.getId(), stepFragment)
                     .commit();
@@ -69,8 +83,9 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
 
     @Override
     public void stepChosen(int stepIndex) {
+        this.stepIndex = stepIndex;
         if(isSplitScreen){
-            stepFragment.setStepIndex(stepIndex);
+            stepFragment.setStepIndex(stepIndex - 1);
         }else{
             Intent intent;
             if (stepIndex == 0) {
@@ -87,5 +102,15 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(getString(R.string.step_recipe_key), recipe);
+        outState.putInt(getString(R.string.step_index_key), stepIndex);
+
+        Recipe savedRecipe = outState.getParcelable(getString(R.string.step_recipe_key));
+        Log.d("naputest", "saving "+savedRecipe.getName());
     }
 }

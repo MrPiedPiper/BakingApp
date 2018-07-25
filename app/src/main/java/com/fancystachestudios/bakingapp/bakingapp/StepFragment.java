@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -46,15 +47,6 @@ import com.google.android.exoplayer2.util.Util;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link StepFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link StepFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
     Context context;
@@ -68,9 +60,11 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     @BindView(R.id.step_next_button)
     Button stepNext;
 
-    Recipe recipe;
-    int stepIndex;
-    Step currStep;
+    static Recipe recipe;
+    static int stepIndex;
+    static Step currStep;
+
+    boolean isInitialized = false;
 
     SimpleExoPlayer mExoPlayer;
 
@@ -78,47 +72,10 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     private static final String TAG = StepActivity.class.getSimpleName();
     private PlaybackStateCompat.Builder mStateBuilder;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     private OnFragmentInteractionListener mListener;
 
     public StepFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment StepFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static StepFragment newInstance(String param1, String param2) {
-        StepFragment fragment = new StepFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -127,6 +84,8 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         // Inflate the layout for this fragment
         final View rootView = inflater.inflate(R.layout.fragment_step, container, false);
         ButterKnife.bind(this, rootView);
+
+        isInitialized = true;
 
         buttonEnableCheck();
 
@@ -225,13 +184,16 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         void onFragmentInteraction(Uri uri);
     }
 
-    public void setRecipe(Recipe recipe){
-        this.recipe = recipe;
+    public void setRecipe(Recipe newRecipe){
+        recipe = newRecipe;
+        Log.d("naputest", "step recipe set to "+recipe.getName());
     }
 
-    public void setStepIndex(int stepIndex){
-        this.stepIndex = stepIndex;
-        updateLayout();
+    public void setStepIndex(int newStepIndex){
+        this.stepIndex = newStepIndex;
+        if(isInitialized){
+            updateLayout();
+        }
     }
 
 
@@ -379,4 +341,5 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
             MediaButtonReceiver.handleIntent(mMediaSession, intent);
         }
     }
+
 }
