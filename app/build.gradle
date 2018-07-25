@@ -45,4 +45,6 @@ dependencies {
 
     //Exoplayer
     implementation 'com.google.android.exoplayer:exoplayer:2.6.1'
+    //MediaSessionCompat
+    implementation 'com.android.support:support-v13:27.1.1'
 }
