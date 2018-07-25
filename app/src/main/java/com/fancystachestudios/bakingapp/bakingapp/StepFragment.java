@@ -12,6 +12,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,8 +57,8 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
     Context context;
 
-    @BindView(R.id.step_player_layout)
-    AspectRatioFrameLayout playerLayout;
+    //@BindView(R.id.step_player_layout)
+    //FrameLayout playerLayout;
     @BindView(R.id.step_player)
     SimpleExoPlayerView mPlayerView;
     @BindView(R.id.step_details)
@@ -125,8 +126,8 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         View rootView = inflater.inflate(R.layout.fragment_step, container, false);
         ButterKnife.bind(this, rootView);
 
-        playerLayout.setAspectRatio(((float)16/9));
-        playerLayout.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
+        //playerLayout.setAspectRatio(((float)16/9));
+        //playerLayout.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIT);
 
         currStep = recipe.getSteps().get(stepIndex);
         stepDetails.setText(currStep.getDescription());
