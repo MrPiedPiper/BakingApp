@@ -165,7 +165,7 @@ public class MasterRecipeFragment extends Fragment implements StepAdapter.StepCl
             intent = new Intent(context, StepActivity.class);
         }
         intent.putExtra(getString(R.string.recipe_pass_key), recipe);
-        intent.putExtra(getString(R.string.step_number_key), clickedItemIndex);
+        intent.putExtra(getString(R.string.step_number_key), clickedItemIndex-1);
         startActivity(intent);
     }
 

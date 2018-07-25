@@ -44,23 +44,6 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
         fragmentManager.beginTransaction()
                 .add(R.id.master_fragment_container, masterRecipeFragment)
                 .commit();
-/*
-        Intent startingIntent = getIntent();
-        recipe = startingIntent.getParcelableExtra(getString(R.string.recipe_pass_key));
-
-        if(recipe == null || recipe.getSteps().size() == 0) {
-            Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        setTitle(recipe.getName());
-
-        listener = this;
-        StepAdapter stepAdapter = new StepAdapter(this, recipe, listener);
-        stepRecyclerView.setAdapter(stepAdapter);
-
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        stepRecyclerView.setLayoutManager(layoutManager);*/
     }
 
     @Override
