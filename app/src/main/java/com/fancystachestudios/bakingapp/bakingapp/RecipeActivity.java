@@ -1,6 +1,9 @@
 package com.fancystachestudios.bakingapp.bakingapp;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,14 +19,9 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RecipeActivity extends AppCompatActivity implements StepAdapter.StepClickListener{
-
-    @BindView(R.id.step_layout)
-    RecyclerView stepRecyclerView;
+public class RecipeActivity extends AppCompatActivity implements MasterRecipeFragment.OnFragmentInteractionListener{
 
     Recipe recipe;
-    ArrayList<Step> steps;
-    StepAdapter.StepClickListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +37,22 @@ public class RecipeActivity extends AppCompatActivity implements StepAdapter.Ste
             return;
         }
 
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        MasterRecipeFragment masterRecipeFragment = new MasterRecipeFragment();
+        masterRecipeFragment.setRecipe(recipe);
+        fragmentManager.beginTransaction()
+                .add(R.id.master_fragment_container, masterRecipeFragment)
+                .commit();
+/*
+        Intent startingIntent = getIntent();
+        recipe = startingIntent.getParcelableExtra(getString(R.string.recipe_pass_key));
+
+        if(recipe == null || recipe.getSteps().size() == 0) {
+            Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         setTitle(recipe.getName());
 
         listener = this;
@@ -46,19 +60,11 @@ public class RecipeActivity extends AppCompatActivity implements StepAdapter.Ste
         stepRecyclerView.setAdapter(stepAdapter);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        stepRecyclerView.setLayoutManager(layoutManager);
+        stepRecyclerView.setLayoutManager(layoutManager);*/
     }
 
     @Override
-    public void onStepClick(int clickedItemIndex) {
-        Intent intent;
-        if(clickedItemIndex == 0){
-            intent = new Intent(this, IngredientActivity.class);
-        }else{
-            intent = new Intent(this, StepActivity.class);
-        }
-        intent.putExtra(getString(R.string.recipe_pass_key), recipe);
-        intent.putExtra(getString(R.string.step_number_key), clickedItemIndex);
-        startActivity(intent);
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }
