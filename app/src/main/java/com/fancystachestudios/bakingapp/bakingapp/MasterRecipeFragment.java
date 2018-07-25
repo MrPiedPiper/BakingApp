@@ -2,15 +2,12 @@ package com.fancystachestudios.bakingapp.bakingapp;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -53,7 +50,7 @@ public class MasterRecipeFragment extends Fragment implements StepAdapter.StepCl
     private String mParam1;
     private String mParam2;
 
-    private OnFragmentInteractionListener mListener;
+    private onChooseStep mListener;
 
     public MasterRecipeFragment() {
         // Required empty public constructor
@@ -117,18 +114,11 @@ public class MasterRecipeFragment extends Fragment implements StepAdapter.StepCl
         return rootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof onChooseStep) {
+            mListener = (onChooseStep) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -151,22 +141,15 @@ public class MasterRecipeFragment extends Fragment implements StepAdapter.StepCl
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    public interface onChooseStep {
+        void stepChosen(int stepIndex);
     }
 
     @Override
     public void onStepClick(int clickedItemIndex) {
-        Intent intent;
-        if(clickedItemIndex == 0){
-            intent = new Intent(context, IngredientActivity.class);
-        }else{
-            intent = new Intent(context, StepActivity.class);
+        if (mListener != null) {
+            mListener.stepChosen(clickedItemIndex);
         }
-        intent.putExtra(getString(R.string.recipe_pass_key), recipe);
-        intent.putExtra(getString(R.string.step_number_key), clickedItemIndex-1);
-        startActivity(intent);
     }
 
     public void setRecipe(Recipe recipe){

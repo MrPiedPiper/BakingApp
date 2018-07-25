@@ -231,6 +231,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
     public void setStepIndex(int stepIndex){
         this.stepIndex = stepIndex;
+        updateLayout();
     }
 
 
