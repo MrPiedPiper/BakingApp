@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -36,18 +37,13 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
         if(savedInstanceState != null){
             Recipe savedRecipe = savedInstanceState.getParcelable(getString(R.string.step_recipe_key_fragment));
             int savedIndex = savedInstanceState.getInt(getString(R.string.step_index_key_fragment));
-            if(isSplitScreen) {
+            if(!isSplitScreen) {
                 recipe = savedRecipe;
                 stepIndex = savedIndex;
             }
         }else{
             Intent startingIntent = getIntent();
             recipe = startingIntent.getParcelableExtra(getString(R.string.recipe_pass_key));
-        }
-
-        if(recipe == null || recipe.getSteps().size() == 0) {
-            Toast.makeText(this, "Something went wrong! (RecipeActivity)", Toast.LENGTH_LONG).show();
-            return;
         }
 
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -115,6 +111,7 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        Log.d("naputest", "saved recipe "+recipe.getName());
         outState.putParcelable(getString(R.string.step_recipe_key_fragment), recipe);
         outState.putInt(getString(R.string.step_index_key_fragment), stepIndex);
 
