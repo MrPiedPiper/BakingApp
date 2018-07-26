@@ -2,29 +2,17 @@ package com.fancystachestudios.bakingapp.bakingapp;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.fancystachestudios.bakingapp.bakingapp.adapters.StepAdapter;
 import com.fancystachestudios.bakingapp.bakingapp.customClasses.Recipe;
-import com.fancystachestudios.bakingapp.bakingapp.customClasses.Step;
 
-import java.util.ArrayList;
+public class RecipeActivity extends AppCompatActivity implements MasterRecipeFragment.onChooseStep, StepFragment.onChangeStep {
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
-public class RecipeActivity extends AppCompatActivity implements MasterRecipeFragment.onChooseStep, StepFragment.OnFragmentInteractionListener{
-
-    @BindView(R.id.step_fragment_container)
     FrameLayout stepContainer;
 
     StepFragment stepFragment;
@@ -40,15 +28,16 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
-        ButterKnife.bind(this);
+
+        stepContainer = findViewById(R.id.step_fragment_container);
 
         if(stepContainer != null){
             isSplitScreen = true;
         }
 
         if(savedInstanceState != null){
-            Recipe savedRecipe = savedInstanceState.getParcelable(getString(R.string.step_recipe_key));
-            int savedIndex = savedInstanceState.getInt(getString(R.string.step_index_key));
+            Recipe savedRecipe = savedInstanceState.getParcelable(getString(R.string.step_recipe_key_fragment));
+            int savedIndex = savedInstanceState.getInt(getString(R.string.step_index_key_fragment));
             if(isSplitScreen) {
                 recipe = savedRecipe;
                 stepIndex = savedIndex;
@@ -126,17 +115,16 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(getString(R.string.step_recipe_key_fragment), recipe);
+        outState.putInt(getString(R.string.step_index_key_fragment), stepIndex);
 
+        Recipe savedRecipe = outState.getParcelable(getString(R.string.step_recipe_key_fragment));
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable(getString(R.string.step_recipe_key), recipe);
-        outState.putInt(getString(R.string.step_index_key), stepIndex);
+    public void stepIndexChanged(int newIndex) {
 
-        Recipe savedRecipe = outState.getParcelable(getString(R.string.step_recipe_key));
-        Log.d("naputest", "saving "+savedRecipe.getName());
     }
 }

@@ -21,8 +21,12 @@
     <string name="step_prev_button">Prev</string>
 
     <!--Keys for StepFragment-->
-    <string name="step_recipe_key">stepRecipeKey</string>
-    <string name="step_index_key">stepIndexKey</string>
+    <string name="step_recipe_key_fragment">stepRecipeKeyFragment</string>
+    <string name="step_index_key_fragment">stepIndexKeyFragment</string>
+
+    <!--Keys for StepActivity-->
+    <string name="step_recipe_key_activity">stepRecipeKeyActivity</string>
+    <string name="step_index_key_activity">stepIndexKeyActivity</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

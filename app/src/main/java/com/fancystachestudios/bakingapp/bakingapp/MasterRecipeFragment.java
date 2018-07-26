@@ -75,7 +75,7 @@ public class MasterRecipeFragment extends Fragment implements StepAdapter.StepCl
             mListener = (onChooseStep) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement onChooseStep");
         }
     }
 

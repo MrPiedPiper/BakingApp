@@ -26,11 +26,6 @@ public class IngredientActivity extends AppCompatActivity {
 
         Intent startingIntent = getIntent();
         Recipe recipe = startingIntent.getParcelableExtra(getString(R.string.recipe_pass_key));
-        if(recipe == null){
-            Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
-            return;
-        }
-
         IngredientAdapter adapter = new IngredientAdapter(this, recipe);
         recyclerView.setAdapter(adapter);
 
