@@ -27,8 +27,7 @@
     <!--Keys for StepActivity-->
     <string name="step_recipe_key_activity">stepRecipeKeyActivity</string>
     <string name="step_index_key_activity">stepIndexKeyActivity</string>
+    <string name="step_seek_key_activity">stepSeekKeyActivity</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

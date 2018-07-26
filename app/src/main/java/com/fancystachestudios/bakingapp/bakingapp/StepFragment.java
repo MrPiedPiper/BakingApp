@@ -13,9 +13,11 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.fancystachestudios.bakingapp.bakingapp.customClasses.Recipe;
@@ -50,6 +52,8 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
     Context context;
 
+    @BindView(R.id.step_scrollview)
+    ScrollView scrollView;
     @Nullable
     @BindView(R.id.step_aspect_layout)
     AspectRatioFrameLayout aspectLayout;
@@ -69,6 +73,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     static Recipe recipe;
     static int stepIndex;
     static Step currStep;
+    static long startPos;
 
     boolean isInitialized = false;
 
@@ -78,7 +83,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     private static final String TAG = StepActivity.class.getSimpleName();
     private PlaybackStateCompat.Builder mStateBuilder;
 
-    private onChangeStep mListener;
+    private stepFragmentInterface mListener;
 
     boolean isLandscape = false;
 
@@ -93,16 +98,27 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         if(getResources().getConfiguration().orientation == getResources().getConfiguration().ORIENTATION_LANDSCAPE) {
             isLandscape = true;
             // Inflate the layout for this fragment
-            rootView = inflater.inflate(R.layout.fullscreen_exoplayer, container, false);
+            //rootView = inflater.inflate(R.layout.fullscreen_exoplayer, container, false);
         }else{
             // Inflate the layout for this fragment
-            rootView = inflater.inflate(R.layout.fragment_step, container, false);
+            //rootView = inflater.inflate(R.layout.fragment_step, container, false);
 
         }
+        rootView = inflater.inflate(R.layout.fragment_step, container, false);
         ButterKnife.bind(this, rootView);
-
         if(isLandscape) {
-            ((AppCompatActivity )getActivity()).getSupportActionBar().hide();
+            ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+            //SetOnTouchListener idea by lily from https://stackoverflow.com/questions/5763304/disable-scrollview-programmatically
+            scrollView.setOnTouchListener(new View.OnTouchListener(){
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    //Log.d("naputest", "touched");
+                    return true;
+                }
+            });
+            aspectLayout.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
+            aspectLayout.setAspectRatio(((float)16/9));
+
         }else{
             aspectLayout.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
             aspectLayout.setAspectRatio(((float)16/9));
@@ -136,9 +152,34 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
         isInitialized = true;
 
-        Log.d("naputest", "(OnCreateView) Stepindex "+stepIndex);
-
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(getResources().getConfiguration().orientation == getResources().getConfiguration().ORIENTATION_LANDSCAPE) {
+            isLandscape = true;
+            // Inflate the layout for this fragment
+            //rootView = inflater.inflate(R.layout.fullscreen_exoplayer, container, false);
+        }else{
+            // Inflate the layout for this fragment
+            //rootView = inflater.inflate(R.layout.fragment_step, container, false);
+        }
+        if(isLandscape) {
+            ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+            //SetOnTouchListener idea by lily from https://stackoverflow.com/questions/5763304/disable-scrollview-programmatically
+            scrollView.setOnTouchListener(new View.OnTouchListener(){
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    return true;
+                    }});
+            aspectLayout.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
+            aspectLayout.setAspectRatio(((float)16/9));
+            }else{
+            aspectLayout.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
+            aspectLayout.setAspectRatio(((float)16/9));
+            }
     }
 
     private void buttonEnableCheck(){
@@ -164,17 +205,14 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         mListener.stepIndexChanged(stepIndex);
         initializeMediaSession();
         initializePlayer(Uri.parse(currStep.getVideoURL()));
-        Log.d("naputest", "Playing "+currStep.getVideoURL());
-
-        Log.d("naputest", "(updateLayout) Stepindex "+stepIndex);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-        if (context instanceof onChangeStep) {
-            mListener = (onChangeStep) context;
+        if (context instanceof stepFragmentInterface) {
+            mListener = (stepFragmentInterface) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement onChooseStep");
@@ -187,13 +225,13 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         mListener = null;
     }
 
-    public interface onChangeStep {
+    public interface stepFragmentInterface {
         void stepIndexChanged(int newIndex);
+        void videoSeekChanged(long seekPos);
     }
 
     public void setRecipe(Recipe newRecipe){
         recipe = newRecipe;
-        Log.d("naputest", "step recipe set to "+recipe.getName());
     }
 
     public void setStepIndex(int newStepIndex){
@@ -201,6 +239,11 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         if(isInitialized){
             updateLayout();
         }
+    }
+
+    public void setStartPos(long newSeek){
+        Log.d("naputest", "seek set to " + newSeek);
+        startPos = newSeek;
     }
 
 
@@ -239,9 +282,11 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
             mExoPlayer.addListener(this);
 
             String userAgent = Util.getUserAgent(context, "BakingApp");
-            Log.d("naputest", mediaUri.toString());
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     context, userAgent), new DefaultExtractorsFactory(), null, null);
+
+            mExoPlayer.seekTo(startPos);
+
             mExoPlayer.prepare(mediaSource);
             mExoPlayer.setPlayWhenReady(true);
 
@@ -249,6 +294,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     }
 
     private void releasePlayer(){
+        startPos = 0;
         mExoPlayer.stop();
         mExoPlayer.release();
         mExoPlayer = null;
@@ -284,6 +330,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        mListener.videoSeekChanged(mExoPlayer.getCurrentPosition());
         if((playbackState == Player.STATE_READY) && playWhenReady){
             mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
                     mExoPlayer.getCurrentPosition(), 1f);
