@@ -74,6 +74,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     static int stepIndex;
     static Step currStep;
     static long startPos;
+    static boolean isFullScreen = false;
 
     boolean isInitialized = false;
 
@@ -85,8 +86,6 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
     private stepFragmentInterface mListener;
 
-    boolean isLandscape = false;
-
     public StepFragment() {
         // Required empty public constructor
     }
@@ -95,57 +94,37 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView;
-        if(getResources().getConfiguration().orientation == getResources().getConfiguration().ORIENTATION_LANDSCAPE) {
-            isLandscape = true;
-            // Inflate the layout for this fragment
-            //rootView = inflater.inflate(R.layout.fullscreen_exoplayer, container, false);
-        }else{
-            // Inflate the layout for this fragment
-            //rootView = inflater.inflate(R.layout.fragment_step, container, false);
-
-        }
         rootView = inflater.inflate(R.layout.fragment_step, container, false);
         ButterKnife.bind(this, rootView);
-        if(isLandscape) {
-            ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
-            //SetOnTouchListener idea by lily from https://stackoverflow.com/questions/5763304/disable-scrollview-programmatically
-            scrollView.setOnTouchListener(new View.OnTouchListener(){
+        aspectLayout.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
+        aspectLayout.setAspectRatio(((float)16/9));
+        buttonEnableCheck();
+        stepPrev.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                if(stepIndex != 0){
+                    stepIndex--; }updateLayout();
+                buttonEnableCheck(); }});
+
+        stepNext.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                if(stepIndex < recipe.getSteps().size() - 1){
+                    stepIndex++; }
+                    updateLayout();
+                buttonEnableCheck(); }
+        });
+
+
+        if(isFullScreen){
+            scrollView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
-                    //Log.d("naputest", "touched");
                     return true;
                 }
             });
-            aspectLayout.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
-            aspectLayout.setAspectRatio(((float)16/9));
-
-        }else{
-            aspectLayout.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
-            aspectLayout.setAspectRatio(((float)16/9));
-            buttonEnableCheck();
-            stepPrev.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view) {
-                    if(stepIndex != 0){
-                        stepIndex--;
-                    }
-                    updateLayout();
-                    buttonEnableCheck();
-                }
-            });
-
-            stepNext.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view) {
-                    if(stepIndex < recipe.getSteps().size() - 1){
-                        stepIndex++;
-                    }
-                    updateLayout();
-                    buttonEnableCheck();
-                }
-            });
-
         }
+
 
         updateLayout();
 
@@ -153,33 +132,6 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         isInitialized = true;
 
         return rootView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if(getResources().getConfiguration().orientation == getResources().getConfiguration().ORIENTATION_LANDSCAPE) {
-            isLandscape = true;
-            // Inflate the layout for this fragment
-            //rootView = inflater.inflate(R.layout.fullscreen_exoplayer, container, false);
-        }else{
-            // Inflate the layout for this fragment
-            //rootView = inflater.inflate(R.layout.fragment_step, container, false);
-        }
-        if(isLandscape) {
-            ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
-            //SetOnTouchListener idea by lily from https://stackoverflow.com/questions/5763304/disable-scrollview-programmatically
-            scrollView.setOnTouchListener(new View.OnTouchListener(){
-                @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    return true;
-                    }});
-            aspectLayout.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
-            aspectLayout.setAspectRatio(((float)16/9));
-            }else{
-            aspectLayout.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
-            aspectLayout.setAspectRatio(((float)16/9));
-            }
     }
 
     private void buttonEnableCheck(){
@@ -198,9 +150,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
     private void updateLayout(){
         currStep = recipe.getSteps().get(stepIndex);
-        if(!isLandscape){
-            stepDetails.setText(currStep.getDescription());
-        }
+        stepDetails.setText(currStep.getDescription());
         if(mExoPlayer != null) releasePlayer();
         mListener.stepIndexChanged(stepIndex);
         initializeMediaSession();
@@ -244,6 +194,10 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     public void setStartPos(long newSeek){
         Log.d("naputest", "seek set to " + newSeek);
         startPos = newSeek;
+    }
+
+    public void setFullscreen(boolean isFullscreen){
+        this.isFullScreen = isFullscreen;
     }
 
 
