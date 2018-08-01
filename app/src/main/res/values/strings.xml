@@ -29,6 +29,8 @@
     <string name="step_recipe_key_activity">stepRecipeKeyActivity</string>
     <string name="step_index_key_activity">stepIndexKeyActivity</string>
     <string name="step_seek_key_activity">stepSeekKeyActivity</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 
 
 </resources>
