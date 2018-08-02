@@ -12,7 +12,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.RemoteViews;
 
 import com.fancystachestudios.bakingapp.bakingapp.IdlingResource.SimpleIdlingResource;
@@ -78,7 +82,15 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         recipeAdapter = new RecipeAdapter(this, recipes, recipeClickListener);
         recipeRecyclerview.setAdapter(recipeAdapter);
 
-        gridLayoutManager = new GridLayoutManager(this, 1);
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+
+        if(dpWidth >= 600){
+            gridLayoutManager = new GridLayoutManager(this, 3);
+        }else{
+            gridLayoutManager = new GridLayoutManager(this, 1);
+        }
+
         recipeRecyclerview.setLayoutManager(gridLayoutManager);
 
         myDatabase = RecipeRoomSingleton.getInstance(this);

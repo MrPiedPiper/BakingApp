@@ -45,8 +45,6 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Ingredient currIngredient = ingredients.get(position);
-        //TODO Make this thing show 1/2 instead of 0.5 ect.
-        //TODO Make a custom layout instead of this one textview one and use a table style thing e.g. [1 cup] apples
         double quantity = currIngredient.getQuantity();
         String measure = currIngredient.getMeasure();
         String ingredient = currIngredient.getIngredient();
