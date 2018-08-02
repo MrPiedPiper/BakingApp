@@ -114,6 +114,10 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
                     if(isLandscape){
                         getSupportActionBar().hide();
                         stepFragment.isFullScreen = true;
+                        View decorView = getWindow().getDecorView();
+                        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+                        decorView.setSystemUiVisibility(uiOptions);
+                        Log.d("naputest", "running");
                     }
                 }
             }
@@ -158,10 +162,6 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
             fragmentManager.beginTransaction()
                     .replace(masterFragmentContainer.getId(), stepFragment)
                     .commit();
-            if(isLandscape){
-                getSupportActionBar().hide();
-                stepFragment.isFullScreen = true;
-            }
             /*Intent intent;
             if (stepIndex == 0) {
                 intent = new Intent(this, IngredientActivity.class);

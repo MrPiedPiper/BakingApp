@@ -16,9 +16,13 @@ import com.fancystachestudios.bakingapp.bakingapp.customClasses.Ingredient;
 import java.util.ArrayList;
 
 /**
- * Listview implemented with help from
+ * Widget implemented with help from
  * Article: https://laaptu.wordpress.com/2013/07/19/android-app-widget-with-listview/
  * Github link: https://github.com/laaptu/appwidget-listview/tree/appwidget-listview1
+ *
+ * and
+ * Udacity
+ * Course: Android Developer Nanodegree Program
  */
 public class BakingWidget extends AppWidgetProvider {
 
@@ -53,12 +57,10 @@ public class BakingWidget extends AppWidgetProvider {
 
     @Override
     public void onEnabled(Context context) {
-        // Enter relevant functionality for when the first widget is created
     }
 
     @Override
     public void onDisabled(Context context) {
-        // Enter relevant functionality for when the last widget is disabled
     }
 }
 

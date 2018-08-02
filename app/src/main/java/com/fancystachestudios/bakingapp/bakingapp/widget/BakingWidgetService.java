@@ -52,7 +52,6 @@ public class BakingWidgetService extends IntentService {
         //Get the widget IDs
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, BakingWidget.class));
         //Notify the manager that the data has changed for the listview
-        //TODO is it here?
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.appwidget_listview);
 
         //Update the appwidget

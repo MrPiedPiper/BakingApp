@@ -1,5 +1,6 @@
 package com.fancystachestudios.bakingapp.bakingapp;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,11 +12,14 @@ import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -97,26 +101,39 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         rootView = inflater.inflate(R.layout.fragment_step, container, false);
         ButterKnife.bind(this, rootView);
         aspectLayout.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
-        aspectLayout.setAspectRatio(((float)16/9));
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float aspectRatio;
+        if(displayMetrics.widthPixels > displayMetrics.heightPixels){
+            aspectRatio = ((float) displayMetrics.widthPixels / (float) displayMetrics.heightPixels);
+        }else{
+            aspectRatio = ((float) displayMetrics.heightPixels / (float) displayMetrics.widthPixels);
+        }
+                aspectLayout.setAspectRatio(aspectRatio);
         buttonEnableCheck();
-        stepPrev.setOnClickListener(new View.OnClickListener(){
+        stepPrev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(stepIndex != 0){
-                    stepIndex--; }updateLayout();
-                buttonEnableCheck(); }});
+                if (stepIndex != 0) {
+                    stepIndex--;
+                }
+                updateLayout();
+                buttonEnableCheck();
+            }
+        });
 
-        stepNext.setOnClickListener(new View.OnClickListener(){
+        stepNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(stepIndex < recipe.getSteps().size() - 1){
-                    stepIndex++; }
-                    updateLayout();
-                buttonEnableCheck(); }
+                if (stepIndex < recipe.getSteps().size() - 1) {
+                    stepIndex++;
+                }
+                updateLayout();
+                buttonEnableCheck();
+            }
         });
 
 
-        if(isFullScreen){
+        if (isFullScreen) {
             scrollView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -134,24 +151,33 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         return rootView;
     }
 
-    private void buttonEnableCheck(){
-        if(stepIndex == 0){
+    private void buttonEnableCheck() {
+        if (stepIndex == 0) {
             stepPrev.setEnabled(false);
-        }else{
+        } else {
             stepPrev.setEnabled(true);
         }
 
-        if(stepIndex == recipe.getSteps().size() - 1){
+        if (stepIndex == recipe.getSteps().size() - 1) {
             stepNext.setEnabled(false);
-        }else{
+        } else {
             stepNext.setEnabled(true);
         }
     }
 
-    private void updateLayout(){
+    private void updateLayout() {
         currStep = recipe.getSteps().get(stepIndex);
         stepDetails.setText(currStep.getDescription());
-        if(mExoPlayer != null) releasePlayer();
+
+        if (mExoPlayer != null) releasePlayer(); Log.d("naputest", "Releasing player");
+
+        if (context instanceof stepFragmentInterface) {
+            mListener = (stepFragmentInterface) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement onChooseStep");
+        }
+
         mListener.stepIndexChanged(stepIndex);
         initializeMediaSession();
         initializePlayer(Uri.parse(currStep.getVideoURL()));
@@ -192,14 +218,8 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     }
 
     public void setStartPos(long newSeek){
-        Log.d("naputest", "seek set to " + newSeek);
         startPos = newSeek;
     }
-
-    public void setFullscreen(boolean isFullscreen){
-        this.isFullScreen = isFullscreen;
-    }
-
 
     private void initializeMediaSession(){
         mMediaSession = new MediaSessionCompat(context, TAG);

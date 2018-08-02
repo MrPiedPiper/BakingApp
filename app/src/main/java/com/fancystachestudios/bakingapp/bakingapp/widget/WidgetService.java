@@ -24,12 +24,10 @@ public class WidgetService extends RemoteViewsService {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d("naputest", "created");
     }
 
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        Log.d("naputest", "Debug ran");
         int appWidgetId = intent.getIntExtra(
                 AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);

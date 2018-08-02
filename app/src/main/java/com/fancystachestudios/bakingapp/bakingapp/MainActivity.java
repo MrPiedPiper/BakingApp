@@ -4,6 +4,10 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.fancystachestudios.bakingapp.bakingapp.IdlingResource.SimpleIdlingResource;
 import com.fancystachestudios.bakingapp.bakingapp.adapters.RecipeAdapter;
 import com.fancystachestudios.bakingapp.bakingapp.customClasses.Recipe;
 import com.fancystachestudios.bakingapp.bakingapp.network.APIClient;
@@ -56,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
 
     Context context;
 
+    @Nullable private SimpleIdlingResource mIdlingResource;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,11 +91,14 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
             public void onResponse(Call<ArrayList<Recipe>> call, Response<ArrayList<Recipe>> response) {
                 recipes.addAll(response.body());
                 recipeAdapter.setDataset(recipes);
+
+                if(mIdlingResource != null){
+                    mIdlingResource.setIdleState(true);
+                }
             }
 
             @Override
             public void onFailure(Call<ArrayList<Recipe>> call, Throwable t) {
-                Log.d("napuResponse", t.toString());
                 call.cancel();
             }
         });
@@ -120,5 +130,14 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         stepsIntent.putExtra(getString(R.string.recipe_pass_key), recipes.get(clickedItemIndex));
 
         startActivity(stepsIntent);
+    }
+
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource(){
+        if(mIdlingResource == null){
+            mIdlingResource = new SimpleIdlingResource();
+        }
+        return mIdlingResource;
     }
 }

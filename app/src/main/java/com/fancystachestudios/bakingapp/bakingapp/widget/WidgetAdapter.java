@@ -63,7 +63,6 @@ public class WidgetAdapter implements RemoteViewsService.RemoteViewsFactory {
         @Override
         protected ArrayList<Ingredient> doInBackground(Void... voids) {
             AppDatabase myDatabase = RecipeRoomSingleton.getInstance(context);
-            Log.d("naputest", "async ran");
             return myDatabase.daoAccess().getAll().get(0).getIngredients();
         }
     }
