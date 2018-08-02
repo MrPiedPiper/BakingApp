@@ -1,11 +1,17 @@
 package com.fancystachestudios.bakingapp.bakingapp.widget;
 
+import android.app.IntentService;
 import android.app.LauncherActivity;
 import android.appwidget.AppWidgetManager;
+import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.Intent;
+import android.content.Loader;
+import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,10 +25,13 @@ import android.widget.TextView;
 import com.fancystachestudios.bakingapp.bakingapp.R;
 import com.fancystachestudios.bakingapp.bakingapp.customClasses.Ingredient;
 import com.fancystachestudios.bakingapp.bakingapp.customClasses.Recipe;
+import com.fancystachestudios.bakingapp.bakingapp.room.AppDatabase;
+import com.fancystachestudios.bakingapp.bakingapp.room.RecipeRoomSingleton;
 
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,27 +45,41 @@ public class WidgetAdapter implements RemoteViewsService.RemoteViewsFactory {
     public WidgetAdapter(@NonNull Context context, Intent intent) {
         this.context = context;
         appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-        if(ingredientsArray.isEmpty()){
-            ingredientsArray.add(new Ingredient(5, "CUPS", "Milk"));
-            ingredientsArray.add(new Ingredient(2, "TBSPS", "Rainbow"));
-            ingredientsArray.add(new Ingredient(1, "LITRE", "oie"));
-            ingredientsArray.add(new Ingredient(1, "thing", ";lkj"));
-            ingredientsArray.add(new Ingredient(1, "a", "asd"));
-            ingredientsArray.add(new Ingredient(1, "ma", "klkj"));
-            ingredientsArray.add(new Ingredient(1, "doodle", "afj"));
-            ingredientsArray.add(new Ingredient(1, "hi", "rocks"));
+        refreshData();
+    }
+
+    private void refreshData() {
+        try {
+            ingredientsArray = new refreshDataAsyncTask().execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class refreshDataAsyncTask extends AsyncTask<Void, Void, ArrayList<Ingredient>>{
+
+        @Override
+        protected ArrayList<Ingredient> doInBackground(Void... voids) {
+            AppDatabase myDatabase = RecipeRoomSingleton.getInstance(context);
+            Log.d("naputest", "async ran");
+            return myDatabase.daoAccess().getAll().get(0).getIngredients();
         }
     }
 
 
     @Override
     public void onCreate() {
-
     }
 
     @Override
     public void onDataSetChanged() {
+        refreshData();
+    }
 
+    public void setDataset(ArrayList<Ingredient> newDataset){
+        ingredientsArray = newDataset;
     }
 
     @Override
@@ -71,6 +94,7 @@ public class WidgetAdapter implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public RemoteViews getViewAt(int i) {
+        if(i > ingredientsArray.size()-1)return null;
         Ingredient ingredient = ingredientsArray.get(i);
 
         //Find views

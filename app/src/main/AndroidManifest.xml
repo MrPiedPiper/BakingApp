@@ -37,6 +37,12 @@
             android:name=".widget.WidgetService"
             android:enabled="true"
             android:exported="true" />
+
+        <service
+            android:name=".widget.BakingWidgetService"
+            android:enabled="true">
+        </service>
+
     </application>
 
 </manifest>

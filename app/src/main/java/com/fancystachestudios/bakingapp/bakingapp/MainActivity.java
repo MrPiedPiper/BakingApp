@@ -1,11 +1,15 @@
 package com.fancystachestudios.bakingapp.bakingapp;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import com.fancystachestudios.bakingapp.bakingapp.adapters.RecipeAdapter;
 import com.fancystachestudios.bakingapp.bakingapp.customClasses.Recipe;
@@ -13,6 +17,9 @@ import com.fancystachestudios.bakingapp.bakingapp.network.APIClient;
 import com.fancystachestudios.bakingapp.bakingapp.network.APIInterface;
 import com.fancystachestudios.bakingapp.bakingapp.room.AppDatabase;
 import com.fancystachestudios.bakingapp.bakingapp.room.RecipeRoomSingleton;
+import com.fancystachestudios.bakingapp.bakingapp.widget.BakingWidget;
+import com.fancystachestudios.bakingapp.bakingapp.widget.BakingWidgetService;
+import com.fancystachestudios.bakingapp.bakingapp.widget.WidgetAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,11 +54,15 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
 
     AppDatabase myDatabase;
 
+    Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        context = this;
 
         apiInterface = APIClient.getClient().create(APIInterface.class);
         getJson();
@@ -94,11 +105,16 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
                 }
                 myDatabase.daoAccess().deleteAll();
                 myDatabase.daoAccess().insertSingleRecipe(recipes.get(clickedItemIndex));
-                List<Recipe> allSaved = myDatabase.daoAccess().getAll();
-                Log.d("naputest", "List is "+allSaved.size()+" long");
-                Log.d("naputest", "List item is "+allSaved.get(0).getName());
+                BakingWidgetService.startActionUpdateBakingWidgets(context);
             }
         }).start();
+/*
+        Context context = getApplicationContext();
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        ComponentName thisWidget = new ComponentName(context, BakingWidget.class);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.appwidget_listview);*/
+
 
         Intent stepsIntent = new Intent(this, RecipeActivity.class);
         stepsIntent.putExtra(getString(R.string.recipe_pass_key), recipes.get(clickedItemIndex));

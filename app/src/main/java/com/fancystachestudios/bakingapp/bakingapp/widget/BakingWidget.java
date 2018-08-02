@@ -5,11 +5,15 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
 import android.widget.RemoteViews;
 
 import com.fancystachestudios.bakingapp.bakingapp.R;
+import com.fancystachestudios.bakingapp.bakingapp.customClasses.Ingredient;
+
+import java.util.ArrayList;
 
 /**
  * Listview implemented with help from
@@ -18,25 +22,33 @@ import com.fancystachestudios.bakingapp.bakingapp.R;
  */
 public class BakingWidget extends AppWidgetProvider {
 
-    private RemoteViews updateWidgetListView(Context context, int appWidgetId){
-        Log.d("naputest", "Made widget log");
+    private static RemoteViews updateWidgetListView(Context context, int appWidgetId, ArrayList<Ingredient> ingredients){
+        //Get the layout
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.baking_widget);
+        //Get the adapter
         Intent serviceIntent = new Intent(context, WidgetService.class);
+        //Attach the WidgetID
         serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         serviceIntent.setData(Uri.parse(serviceIntent.toUri(Intent.URI_INTENT_SCHEME)));
+        //Set the adapter
         remoteViews.setRemoteAdapter(appWidgetId, R.id.appwidget_listview, serviceIntent);
-        //remoteViews.setEmptyView(R.id.appwidget_listview, R.id.widget_empty_view);
+        //Set the empty view
+        remoteViews.setEmptyView(R.id.appwidget_listview, R.id.widget_empty_view);
+        //Return layout
         return remoteViews;
+    }
+    public static void updateAppWidget(Context context, int[] appWidgetIds, AppWidgetManager appWidgetManager, ArrayList<Ingredient> ingredients){
+        //For each widget,
+        for(int appWidgetId : appWidgetIds){
+            //Update said widget
+            appWidgetManager.updateAppWidget(appWidgetId, updateWidgetListView(context, appWidgetId, ingredients));
+        }
     }
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        int N = appWidgetIds.length;
-        // There may be multiple widgets active, so update all of them
-        for (int i = 0; i < N; ++i) {
-            RemoteViews remoteViews = updateWidgetListView(context, appWidgetIds[i]);
-            appWidgetManager.updateAppWidget(appWidgetIds[i], remoteViews);
-        }
+        //Trigger update
+        BakingWidgetService.startActionUpdateBakingWidgets(context);
     }
 
     @Override
