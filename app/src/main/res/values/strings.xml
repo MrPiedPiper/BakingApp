@@ -32,5 +32,7 @@
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
 
+    <!--Room database name-->
+    <string name="room_name">recipeRoomName</string>
 
 </resources>

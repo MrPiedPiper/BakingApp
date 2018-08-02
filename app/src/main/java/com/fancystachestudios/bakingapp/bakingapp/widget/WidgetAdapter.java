@@ -75,7 +75,7 @@ public class WidgetAdapter implements RemoteViewsService.RemoteViewsFactory {
 
         //Find views
         RemoteViews widgetItem = new RemoteViews(context.getPackageName(), R.layout.baking_widget_item);
-        
+
         double quantity = ingredient.getQuantity();
         String measure = ingredient.getMeasure();
         String ingredientText = ingredient.getIngredient();

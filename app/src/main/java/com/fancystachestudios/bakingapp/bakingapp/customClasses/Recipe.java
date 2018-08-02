@@ -1,14 +1,21 @@
 package com.fancystachestudios.bakingapp.bakingapp.customClasses;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.v4.widget.CircularProgressDrawable;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
+@Entity
 public class Recipe implements Parcelable{
 
+    @NonNull
+    @PrimaryKey
     @SerializedName("id")
     private int id;
     @SerializedName("name")

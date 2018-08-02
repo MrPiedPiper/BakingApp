@@ -11,8 +11,11 @@ import com.fancystachestudios.bakingapp.bakingapp.adapters.RecipeAdapter;
 import com.fancystachestudios.bakingapp.bakingapp.customClasses.Recipe;
 import com.fancystachestudios.bakingapp.bakingapp.network.APIClient;
 import com.fancystachestudios.bakingapp.bakingapp.network.APIInterface;
+import com.fancystachestudios.bakingapp.bakingapp.room.AppDatabase;
+import com.fancystachestudios.bakingapp.bakingapp.room.RecipeRoomSingleton;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,6 +45,8 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
     RecipeAdapter recipeAdapter;
     GridLayoutManager gridLayoutManager;
 
+    AppDatabase myDatabase;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
         gridLayoutManager = new GridLayoutManager(this, 1);
         recipeRecyclerview.setLayoutManager(gridLayoutManager);
 
+        myDatabase = RecipeRoomSingleton.getInstance(this);
     }
 
     private void getJson(){
@@ -79,7 +85,21 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.Rec
 
 
     @Override
-    public void onRecipeClick(int clickedItemIndex) {
+    public void onRecipeClick(final int clickedItemIndex) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if(myDatabase.daoAccess().fetchSingleMovieById(recipes.get(clickedItemIndex).getId()) == null){
+                    myDatabase.daoAccess().insertSingleRecipe(recipes.get(clickedItemIndex));
+                }
+                myDatabase.daoAccess().deleteAll();
+                myDatabase.daoAccess().insertSingleRecipe(recipes.get(clickedItemIndex));
+                List<Recipe> allSaved = myDatabase.daoAccess().getAll();
+                Log.d("naputest", "List is "+allSaved.size()+" long");
+                Log.d("naputest", "List item is "+allSaved.get(0).getName());
+            }
+        }).start();
+
         Intent stepsIntent = new Intent(this, RecipeActivity.class);
         stepsIntent.putExtra(getString(R.string.recipe_pass_key), recipes.get(clickedItemIndex));
 
