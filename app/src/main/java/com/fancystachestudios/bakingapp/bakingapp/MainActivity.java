@@ -1,7 +1,5 @@
 package com.fancystachestudios.bakingapp.bakingapp;
 
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -13,11 +11,6 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.Display;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.RemoteViews;
 
 import com.fancystachestudios.bakingapp.bakingapp.IdlingResource.SimpleIdlingResource;
 import com.fancystachestudios.bakingapp.bakingapp.adapters.RecipeAdapter;
@@ -25,13 +18,10 @@ import com.fancystachestudios.bakingapp.bakingapp.customClasses.Recipe;
 import com.fancystachestudios.bakingapp.bakingapp.network.APIClient;
 import com.fancystachestudios.bakingapp.bakingapp.network.APIInterface;
 import com.fancystachestudios.bakingapp.bakingapp.room.AppDatabase;
-import com.fancystachestudios.bakingapp.bakingapp.room.RecipeRoomSingleton;
-import com.fancystachestudios.bakingapp.bakingapp.widget.BakingWidget;
+import com.fancystachestudios.bakingapp.bakingapp.singletons.RecipeRoomSingleton;
 import com.fancystachestudios.bakingapp.bakingapp.widget.BakingWidgetService;
-import com.fancystachestudios.bakingapp.bakingapp.widget.WidgetAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

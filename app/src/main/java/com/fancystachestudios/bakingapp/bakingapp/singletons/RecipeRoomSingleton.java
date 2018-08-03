@@ -1,9 +1,10 @@
-package com.fancystachestudios.bakingapp.bakingapp.room;
+package com.fancystachestudios.bakingapp.bakingapp.singletons;
 
 import android.arch.persistence.room.Room;
 import android.content.Context;
 
 import com.fancystachestudios.bakingapp.bakingapp.R;
+import com.fancystachestudios.bakingapp.bakingapp.room.AppDatabase;
 
 public class RecipeRoomSingleton {
 

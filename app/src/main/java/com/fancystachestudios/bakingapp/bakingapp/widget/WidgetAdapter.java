@@ -1,40 +1,20 @@
 package com.fancystachestudios.bakingapp.bakingapp.widget;
 
-import android.app.IntentService;
-import android.app.LauncherActivity;
 import android.appwidget.AppWidgetManager;
-import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
-import android.widget.TextView;
 
 import com.fancystachestudios.bakingapp.bakingapp.R;
 import com.fancystachestudios.bakingapp.bakingapp.customClasses.Ingredient;
-import com.fancystachestudios.bakingapp.bakingapp.customClasses.Recipe;
 import com.fancystachestudios.bakingapp.bakingapp.room.AppDatabase;
-import com.fancystachestudios.bakingapp.bakingapp.room.RecipeRoomSingleton;
-
-import org.w3c.dom.Text;
+import com.fancystachestudios.bakingapp.bakingapp.singletons.RecipeRoomSingleton;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class WidgetAdapter implements RemoteViewsService.RemoteViewsFactory {
 

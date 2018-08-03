@@ -2,20 +2,15 @@ package com.fancystachestudios.bakingapp.bakingapp.widget;
 
 import android.app.IntentService;
 import android.appwidget.AppWidgetManager;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.util.Log;
-import android.widget.RemoteViews;
 
 import com.fancystachestudios.bakingapp.bakingapp.R;
 import com.fancystachestudios.bakingapp.bakingapp.customClasses.Ingredient;
 import com.fancystachestudios.bakingapp.bakingapp.room.AppDatabase;
-import com.fancystachestudios.bakingapp.bakingapp.room.RecipeRoomSingleton;
+import com.fancystachestudios.bakingapp.bakingapp.singletons.RecipeRoomSingleton;
 
 import java.util.ArrayList;
 

@@ -82,7 +82,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
     boolean isInitialized = false;
 
-    SimpleExoPlayer mExoPlayer;
+    static SimpleExoPlayer mExoPlayer;
 
     private static MediaSessionCompat mMediaSession;
     private static final String TAG = StepActivity.class.getSimpleName();
@@ -116,6 +116,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
                 if (stepIndex != 0) {
                     stepIndex--;
                 }
+                startPos = 0;
                 updateLayout();
                 buttonEnableCheck();
             }
@@ -127,6 +128,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
                 if (stepIndex < recipe.getSteps().size() - 1) {
                     stepIndex++;
                 }
+                startPos = 0;
                 updateLayout();
                 buttonEnableCheck();
             }
@@ -169,8 +171,6 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         currStep = recipe.getSteps().get(stepIndex);
         stepDetails.setText(currStep.getDescription());
 
-        if (mExoPlayer != null) releasePlayer(); Log.d("naputest", "Releasing player");
-
         if (context instanceof stepFragmentInterface) {
             mListener = (stepFragmentInterface) context;
         } else {
@@ -179,6 +179,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         }
 
         mListener.stepIndexChanged(stepIndex);
+        releasePlayer();
         initializeMediaSession();
         initializePlayer(Uri.parse(currStep.getVideoURL()));
     }
@@ -259,19 +260,23 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     context, userAgent), new DefaultExtractorsFactory(), null, null);
 
+            Log.d("naputest", "Setting player to "+startPos);
             mExoPlayer.seekTo(startPos);
 
-            mExoPlayer.prepare(mediaSource);
+            mExoPlayer.prepare(mediaSource, false, true
+            );
             mExoPlayer.setPlayWhenReady(true);
 
         }
     }
 
     private void releasePlayer(){
-        startPos = 0;
-        mExoPlayer.stop();
-        mExoPlayer.release();
-        mExoPlayer = null;
+        if(mExoPlayer != null){
+            Log.d("naputest", "releasing player");
+            mExoPlayer.stop();
+            mExoPlayer.release();
+            mExoPlayer = null;
+        }
     }
 
     @Override
@@ -284,7 +289,9 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     @Override
     public void onPause() {
         super.onPause();
-        mExoPlayer.setPlayWhenReady(false);
+        if(mExoPlayer != null){
+            mExoPlayer.setPlayWhenReady(false);
+        }
     }
 
     @Override

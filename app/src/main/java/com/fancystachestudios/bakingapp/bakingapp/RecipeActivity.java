@@ -63,6 +63,7 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
             stepIndex = savedIndex;
             isLookingAtStep = savedIsLookingAtStep;
             seekPos = savedSeekPos;
+            Log.d("naputest", "Activity got "+seekPos);
         }else{
             Intent startingIntent = getIntent();
             recipe = startingIntent.getParcelableExtra(getString(R.string.recipe_pass_key));
@@ -75,10 +76,11 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
 
         stepFragment = new StepFragment();
         stepFragment.setRecipe(recipe);
+        stepFragment.setStartPos(seekPos);
 
         ingredientsFragment = new IngredientsFragment();
         ingredientsFragment.setRecipe(recipe);
-//TODO Now that the step-activity  is implemented into the fragment, add the IngredientActivity too.
+
         if(isSplitScreen){
             isLookingAtStep = true;
             fragmentManager.beginTransaction()
@@ -89,7 +91,7 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
                         .add(stepContainer.getId(), ingredientsFragment)
                         .commit();
             }else{
-                stepFragment.setStepIndex(stepIndex-1);
+                stepFragment.setStepIndex(stepIndex);
                 fragmentManager.beginTransaction()
                         .replace(stepContainer.getId(), stepFragment)
                         .commit();
@@ -194,9 +196,6 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
         outState.putInt(getString(R.string.step_index_key_fragment), stepIndex);
         outState.putBoolean(getString(R.string.step_is_on_step_boolean_key_fragment), isLookingAtStep);
         outState.putLong(getString(R.string.step_seek_key_activity), seekPos);
-
-
-        Recipe savedRecipe = outState.getParcelable(getString(R.string.step_recipe_key_fragment));
     }
 
     @Override
