@@ -39,6 +39,7 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
     boolean isSplitScreen = false;
     boolean isLookingAtStep = false;
     boolean isLandscape = false;
+    boolean playOnResume = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +60,12 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
             int savedIndex = savedInstanceState.getInt(getString(R.string.step_index_key_fragment));
             boolean savedIsLookingAtStep = savedInstanceState.getBoolean(getString(R.string.step_is_on_step_boolean_key_fragment));
             long savedSeekPos = savedInstanceState.getLong(getString(R.string.step_seek_key_activity));
+            boolean savedPlayOnResume = savedInstanceState.getBoolean(getString(R.string.step_play_on_resume_fragment));
             recipe = savedRecipe;
             stepIndex = savedIndex;
             isLookingAtStep = savedIsLookingAtStep;
             seekPos = savedSeekPos;
-            Log.d("naputest", "Activity got "+seekPos);
+            playOnResume = savedPlayOnResume;
         }else{
             Intent startingIntent = getIntent();
             recipe = startingIntent.getParcelableExtra(getString(R.string.recipe_pass_key));
@@ -77,12 +79,12 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
         stepFragment = new StepFragment();
         stepFragment.setRecipe(recipe);
         stepFragment.setStartPos(seekPos);
+        stepFragment.setPlayOnResume(playOnResume);
 
         ingredientsFragment = new IngredientsFragment();
         ingredientsFragment.setRecipe(recipe);
 
         if(isSplitScreen){
-            isLookingAtStep = true;
             fragmentManager.beginTransaction()
                     .add(masterFragmentContainer.getId(), masterRecipeFragment)
                     .commit();
@@ -119,7 +121,6 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
                         View decorView = getWindow().getDecorView();
                         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
                         decorView.setSystemUiVisibility(uiOptions);
-                        Log.d("naputest", "running");
                     }
                 }
             }
@@ -145,7 +146,7 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
                             .replace(stepContainer.getId(), stepFragment)
                             .commit();
                 }
-                stepFragment.setStepIndex(stepIndex - 1);
+                stepFragment.setStepIndex(stepIndex);
             }
         }else if(stepIndex == 0){
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -158,7 +159,7 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
             fragmentManager.beginTransaction()
                     .replace(masterFragmentContainer.getId(), stepFragment)
                     .commit();
-            stepFragment.setStepIndex(stepIndex-1);
+            stepFragment.setStepIndex(stepIndex);
             isLookingAtStep = true;
             stepFragment.setStartPos(seekPos);
             fragmentManager.beginTransaction()
@@ -178,7 +179,9 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
 
     @Override
     public void onBackPressed() {
-        if(isLookingAtStep){
+        if(isSplitScreen){
+            super.onBackPressed();
+        }else if(isLookingAtStep){
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(masterFragmentContainer.getId(), masterRecipeFragment)
@@ -196,15 +199,23 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
         outState.putInt(getString(R.string.step_index_key_fragment), stepIndex);
         outState.putBoolean(getString(R.string.step_is_on_step_boolean_key_fragment), isLookingAtStep);
         outState.putLong(getString(R.string.step_seek_key_activity), seekPos);
+        outState.putBoolean(getString(R.string.step_play_on_resume_fragment), playOnResume);
     }
 
     @Override
     public void stepIndexChanged(int newIndex) {
+        if (stepIndex > 0){
         stepIndex = newIndex;
+        }
     }
 
     @Override
     public void videoSeekChanged(long seekPos) {
         this.seekPos = seekPos;
+    }
+
+    @Override
+    public void playOnResumeChanged(boolean playOnResume) {
+        this.playOnResume = playOnResume;
     }
 }

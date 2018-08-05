@@ -30,7 +30,9 @@
                 android:background="@color/colorPrimary"
                 android:id="@+id/step_player"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent"
+                app:fastforward_increment="1000"
+                app:rewind_increment="1000"/>
 
         </com.google.android.exoplayer2.ui.AspectRatioFrameLayout>
 

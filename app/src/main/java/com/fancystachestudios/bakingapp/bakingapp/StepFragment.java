@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaButtonReceiver;
@@ -74,11 +75,12 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     @BindView(R.id.step_next_button)
     Button stepNext;
 
-    static Recipe recipe;
-    static int stepIndex;
-    static Step currStep;
-    static long startPos;
+    private static Recipe recipe;
+    private static int stepIndex;
+    private static Step currStep;
+    private static long startPos;
     static boolean isFullScreen = false;
+    private boolean playOnResume = false;
 
     boolean isInitialized = false;
 
@@ -90,6 +92,8 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
     private stepFragmentInterface mListener;
 
+    private boolean exoIsPlaying = false;
+
     public StepFragment() {
         // Required empty public constructor
     }
@@ -100,6 +104,11 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         final View rootView;
         rootView = inflater.inflate(R.layout.fragment_step, container, false);
         ButterKnife.bind(this, rootView);
+
+        if(savedInstanceState != null){
+            startPos = savedInstanceState.getLong(getString(R.string.step_seek_pos_fragment));
+        }
+
         aspectLayout.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         float aspectRatio;
@@ -147,14 +156,13 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
         updateLayout();
 
-
         isInitialized = true;
 
         return rootView;
     }
 
     private void buttonEnableCheck() {
-        if (stepIndex == 0) {
+        if (stepIndex == 1) {
             stepPrev.setEnabled(false);
         } else {
             stepPrev.setEnabled(true);
@@ -168,7 +176,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     }
 
     private void updateLayout() {
-        currStep = recipe.getSteps().get(stepIndex);
+        currStep = recipe.getSteps().get(stepIndex - 1);
         stepDetails.setText(currStep.getDescription());
 
         if (context instanceof stepFragmentInterface) {
@@ -177,7 +185,6 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
             throw new RuntimeException(context.toString()
                     + " must implement onChooseStep");
         }
-
         mListener.stepIndexChanged(stepIndex);
         releasePlayer();
         initializeMediaSession();
@@ -205,6 +212,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     public interface stepFragmentInterface {
         void stepIndexChanged(int newIndex);
         void videoSeekChanged(long seekPos);
+        void playOnResumeChanged(boolean playOnResume);
     }
 
     public void setRecipe(Recipe newRecipe){
@@ -220,6 +228,10 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
     public void setStartPos(long newSeek){
         startPos = newSeek;
+    }
+
+    public void setPlayOnResume(boolean playOnResume){
+        this.playOnResume = playOnResume;
     }
 
     private void initializeMediaSession(){
@@ -260,7 +272,6 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     context, userAgent), new DefaultExtractorsFactory(), null, null);
 
-            Log.d("naputest", "Setting player to "+startPos);
             mExoPlayer.seekTo(startPos);
 
             mExoPlayer.prepare(mediaSource, false, true
@@ -272,7 +283,6 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
     private void releasePlayer(){
         if(mExoPlayer != null){
-            Log.d("naputest", "releasing player");
             mExoPlayer.stop();
             mExoPlayer.release();
             mExoPlayer = null;
@@ -289,8 +299,56 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     @Override
     public void onPause() {
         super.onPause();
-        if(mExoPlayer != null){
+        if(mExoPlayer != null) {
+            if (exoIsPlaying){
+                playOnResume = true;
+            }else{
+                playOnResume = false;
+            }
+            mListener.playOnResumeChanged(playOnResume);
+            //mExoPlayer.setPlayWhenReady(false);
+        }
+        if(Util.SDK_INT <= 23){
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();/*
+        if(mExoPlayer != null) {
+            if (exoIsPlaying){
+                playOnResume = true;
+            }else{
+                playOnResume = false;
+            }
+            mListener.playOnResumeChanged(playOnResume);
             mExoPlayer.setPlayWhenReady(false);
+        }*/
+        if(Util.SDK_INT > 23){
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if(Util.SDK_INT > 23){
+            initializeMediaSession();
+            initializePlayer(Uri.parse(currStep.getVideoURL()));
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(Util.SDK_INT <= 23 || mExoPlayer == null){
+            initializeMediaSession();
+            initializePlayer(Uri.parse(currStep.getVideoURL()));
+        }
+        if(mExoPlayer != null){
+            Log.d("naputest", "setting");
+            mExoPlayer.setPlayWhenReady(playOnResume);
         }
     }
 
@@ -315,9 +373,11 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         if((playbackState == Player.STATE_READY) && playWhenReady){
             mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
                     mExoPlayer.getCurrentPosition(), 1f);
+            exoIsPlaying = true;
         }else if(playbackState == Player.STATE_READY){
             mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
                     mExoPlayer.getCurrentPosition(), 1f);
+            exoIsPlaying = false;
         }
         mMediaSession.setPlaybackState(mStateBuilder.build());
     }
@@ -378,4 +438,12 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         }
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(mExoPlayer != null){
+            outState.putLong(getString(R.string.step_seek_pos_fragment), mExoPlayer.getCurrentPosition());
+        }
+
+    }
 }

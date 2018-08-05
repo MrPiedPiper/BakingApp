@@ -25,6 +25,9 @@
     <string name="step_index_key_fragment">stepIndexKeyFragment</string>
     <string name="step_is_on_step_boolean_key_fragment">lookingAtStepKeyFragment</string>
 
+    <string name="step_seek_pos_fragment">stepSeekPosFragment</string>
+    <string name="step_play_on_resume_fragment">stepPlayOnResumeFragment</string>
+
     <!--Keys for StepActivity-->
     <string name="step_recipe_key_activity">stepRecipeKeyActivity</string>
     <string name="step_index_key_activity">stepIndexKeyActivity</string>

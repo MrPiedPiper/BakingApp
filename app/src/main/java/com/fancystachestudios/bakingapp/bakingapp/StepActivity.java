@@ -86,4 +86,10 @@ public class StepActivity extends AppCompatActivity implements StepFragment.step
     public void videoSeekChanged(long seekPos) {
         this.seekPos = seekPos;
     }
+
+    @Override
+    public void playOnResumeChanged(boolean playOnResume) {
+
+
+    }
 }
