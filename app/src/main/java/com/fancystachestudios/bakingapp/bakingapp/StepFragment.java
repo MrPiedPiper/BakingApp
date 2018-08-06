@@ -107,6 +107,8 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
         if(savedInstanceState != null){
             startPos = savedInstanceState.getLong(getString(R.string.step_seek_pos_fragment));
+            playOnResume = savedInstanceState.getBoolean(getString(R.string.step_play_on_resume_fragment));
+            Log.d("naputest", "Recieved "+playOnResume);
         }
 
         aspectLayout.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH);
@@ -231,7 +233,7 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     }
 
     public void setPlayOnResume(boolean playOnResume){
-        this.playOnResume = playOnResume;
+        //this.playOnResume = playOnResume;
     }
 
     private void initializeMediaSession(){
@@ -276,7 +278,8 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
 
             mExoPlayer.prepare(mediaSource, false, true
             );
-            mExoPlayer.setPlayWhenReady(true);
+            Log.d("naputestt", "playOnResume = "+playOnResume);
+            mExoPlayer.setPlayWhenReady(playOnResume);
 
         }
     }
@@ -301,9 +304,9 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         super.onPause();
         if(mExoPlayer != null) {
             if (exoIsPlaying){
-                playOnResume = true;
+                //playOnResume = true;
             }else{
-                playOnResume = false;
+                //playOnResume = false;
             }
             mListener.playOnResumeChanged(playOnResume);
             //mExoPlayer.setPlayWhenReady(false);
@@ -347,8 +350,8 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
             initializePlayer(Uri.parse(currStep.getVideoURL()));
         }
         if(mExoPlayer != null){
-            Log.d("naputest", "setting");
-            mExoPlayer.setPlayWhenReady(playOnResume);
+            //Log.d("naputest", "setting");
+            //mExoPlayer.setPlayWhenReady(playOnResume);
         }
     }
 
@@ -443,6 +446,8 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         super.onSaveInstanceState(outState);
         if(mExoPlayer != null){
             outState.putLong(getString(R.string.step_seek_pos_fragment), mExoPlayer.getCurrentPosition());
+            outState.putBoolean(getString(R.string.step_play_on_resume_fragment), mExoPlayer.getPlayWhenReady());
+            Log.d("naputest", "Saving "+mExoPlayer.getPlayWhenReady());
         }
 
     }

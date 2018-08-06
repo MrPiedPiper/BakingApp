@@ -2,6 +2,7 @@ package com.fancystachestudios.bakingapp.bakingapp;
 
 import android.content.Intent;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,6 +19,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class RecipeActivity extends AppCompatActivity implements MasterRecipeFragment.onChooseStep, StepFragment.stepFragmentInterface {
+
+    static final String FRAGMENT_STEPS = "steps";
+    static final String FRAGMENT_STEP = "step";
+    static final String FRAGMENT_INGREDIENTS = "ingredients";
 
     @Nullable
     @BindView(R.id.step_fragment_container)
@@ -73,58 +78,121 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
-        masterRecipeFragment = new MasterRecipeFragment();
-        masterRecipeFragment.setRecipe(recipe);
+        if(fragmentManager.findFragmentByTag(FRAGMENT_STEPS) == null){
+            masterRecipeFragment = new MasterRecipeFragment();
+        }else{
+            masterRecipeFragment = (MasterRecipeFragment) fragmentManager.findFragmentByTag(FRAGMENT_STEPS);
+        }
+        if(fragmentManager.findFragmentByTag(FRAGMENT_STEP)== null){
+            stepFragment = new StepFragment();
+        }else{
+            stepFragment = (StepFragment) fragmentManager.findFragmentByTag(FRAGMENT_STEP);
+        }
+        if(fragmentManager.findFragmentByTag(FRAGMENT_INGREDIENTS)== null){
+            ingredientsFragment = new IngredientsFragment();
+        }else{
+            ingredientsFragment = (IngredientsFragment) fragmentManager.findFragmentByTag(FRAGMENT_INGREDIENTS);
+        }
 
+        /*masterRecipeFragment = new MasterRecipeFragment();
         stepFragment = new StepFragment();
+        ingredientsFragment = new IngredientsFragment();*/
+
+        masterRecipeFragment.setRecipe(recipe);
         stepFragment.setRecipe(recipe);
         stepFragment.setStartPos(seekPos);
         stepFragment.setPlayOnResume(playOnResume);
-
-        ingredientsFragment = new IngredientsFragment();
         ingredientsFragment.setRecipe(recipe);
 
-        if(isSplitScreen){
-            fragmentManager.beginTransaction()
-                    .add(masterFragmentContainer.getId(), masterRecipeFragment)
-                    .commit();
-            if(stepIndex == 0){
+        if(fragmentManager.findFragmentByTag(FRAGMENT_STEPS) == null){
+            if(isSplitScreen){
                 fragmentManager.beginTransaction()
-                        .add(stepContainer.getId(), ingredientsFragment)
+                        .add(masterFragmentContainer.getId(), masterRecipeFragment, FRAGMENT_STEPS)
                         .commit();
-            }else{
-                stepFragment.setStepIndex(stepIndex);
-                fragmentManager.beginTransaction()
-                        .replace(stepContainer.getId(), stepFragment)
-                        .commit();
-            }
-        }else{
-            if(!isLookingAtStep) {
-                fragmentManager.beginTransaction()
-                        .add(masterFragmentContainer.getId(), masterRecipeFragment)
-                        .commit();
-            } else {
                 if(stepIndex == 0){
                     fragmentManager.beginTransaction()
-                            .add(masterFragmentContainer.getId(), ingredientsFragment)
+                            .add(stepContainer.getId(), ingredientsFragment, FRAGMENT_INGREDIENTS)
                             .commit();
-                    isLookingAtStep = true;
                 }else{
                     stepFragment.setStepIndex(stepIndex);
                     fragmentManager.beginTransaction()
-                            .add(masterFragmentContainer.getId(), stepFragment)
+                            .replace(stepContainer.getId(), stepFragment, FRAGMENT_STEP)
                             .commit();
-                    stepFragment.setStartPos(seekPos);
-                    if(isLandscape){
-                        getSupportActionBar().hide();
-                        stepFragment.isFullScreen = true;
-                        View decorView = getWindow().getDecorView();
-                        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-                        decorView.setSystemUiVisibility(uiOptions);
+                }
+            }else{
+                if(!isLookingAtStep) {
+                    fragmentManager.beginTransaction()
+                            .add(masterFragmentContainer.getId(), masterRecipeFragment)
+                            .commit();
+                } else {
+                    if(stepIndex == 0){
+                        fragmentManager.beginTransaction()
+                                .add(masterFragmentContainer.getId(), ingredientsFragment)
+                                .commit();
+                        isLookingAtStep = true;
+                    }else{
+                        stepFragment.setStepIndex(stepIndex);
+                        fragmentManager.beginTransaction()
+                                .add(masterFragmentContainer.getId(), stepFragment)
+                                .commit();
+                        stepFragment.setStartPos(seekPos);
+                        if(isLandscape){
+                            getSupportActionBar().hide();
+                            stepFragment.isFullScreen = true;
+                            View decorView = getWindow().getDecorView();
+                            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+                            decorView.setSystemUiVisibility(uiOptions);
+                        }
                     }
                 }
             }
+        }else{
+            if(isSplitScreen){
+                fragmentManager.beginTransaction()
+                        .replace(masterFragmentContainer.getId(), masterRecipeFragment, FRAGMENT_STEPS)
+                        .commit();
+                if(stepIndex == 0){
+                    fragmentManager.beginTransaction()
+                            .replace(stepContainer.getId(), ingredientsFragment, FRAGMENT_INGREDIENTS)
+                            .commit();
+                }else{
+                    stepFragment.setStepIndex(stepIndex);
+                    fragmentManager.beginTransaction()
+                            .replace(stepContainer.getId(), stepFragment, FRAGMENT_STEP)
+                            .commit();
+                }
+            }else{
+                if(!isLookingAtStep) {
+                    fragmentManager.beginTransaction()
+                            .replace(masterFragmentContainer.getId(), masterRecipeFragment)
+                            .commit();
+                } else {
+                    if(stepIndex == 0){
+                        //Fragment tempFragment = fragmentManager.findFragmentById(masterFragmentContainer.getId());
+                        //Log.d("naputest", "Fragment is instance of IngredientsFragment: "+(tempFragment instanceof IngredientsFragment));
+                        fragmentManager.beginTransaction()
+                                .remove(fragmentManager.findFragmentByTag(FRAGMENT_INGREDIENTS))
+                                .replace(masterFragmentContainer.getId(), ingredientsFragment)
+                                .commit();
+                        isLookingAtStep = true;
+                    }/*else{
+                        stepFragment.setStepIndex(stepIndex);
+                        fragmentManager.beginTransaction()
+                                .replace(masterFragmentContainer.getId(), stepFragment)
+                                .commit();
+                        stepFragment.setStartPos(seekPos);
+                        if(isLandscape){
+                            getSupportActionBar().hide();
+                            stepFragment.isFullScreen = true;
+                            View decorView = getWindow().getDecorView();
+                            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+                            decorView.setSystemUiVisibility(uiOptions);
+                        }
+                    }*/
+                }
+            }
         }
+
     }
 
 
