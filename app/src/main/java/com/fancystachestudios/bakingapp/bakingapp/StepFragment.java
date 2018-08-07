@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -66,6 +67,8 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
     @Nullable
     @BindView(R.id.step_player)
     SimpleExoPlayerView mPlayerView;
+    @BindView(R.id.step_thumbnail)
+    ImageView stepThumbnail;
     @Nullable
     @BindView(R.id.step_details)
     TextView stepDetails;
@@ -199,6 +202,20 @@ public class StepFragment extends Fragment implements ExoPlayer.EventListener {
         releasePlayer();
         initializeMediaSession();
         initializePlayer(Uri.parse(currStep.getVideoURL()));
+        Log.d("naputest", "vid "+currStep.getVideoURL());
+        if(currStep.getVideoURL().equals("")){
+            Log.d("naputest", currStep.getThumbnailURL());
+            if(!currStep.getThumbnailURL().equals("")){
+                Log.d("naputest", "setting image "+currStep.getThumbnailURL()
+                );
+                Picasso.get().load(currStep.getThumbnailURL()).into(stepThumbnail);
+                stepThumbnail.setVisibility(View.VISIBLE);
+                mPlayerView.setVisibility(View.INVISIBLE);
+            }
+        }else{
+            stepThumbnail.setVisibility(View.INVISIBLE);
+            mPlayerView.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
