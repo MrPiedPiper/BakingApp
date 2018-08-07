@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
@@ -60,25 +61,13 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
             isLandscape = true;
         }
 
-        if(savedInstanceState != null){
-            Recipe savedRecipe = savedInstanceState.getParcelable(getString(R.string.step_recipe_key_fragment));
-            int savedIndex = savedInstanceState.getInt(getString(R.string.step_index_key_fragment));
-            boolean savedIsLookingAtStep = savedInstanceState.getBoolean(getString(R.string.step_is_on_step_boolean_key_fragment));
-            long savedSeekPos = savedInstanceState.getLong(getString(R.string.step_seek_key_activity));
-            boolean savedPlayOnResume = savedInstanceState.getBoolean(getString(R.string.step_play_on_resume_fragment));
-            recipe = savedRecipe;
-            stepIndex = savedIndex;
-            isLookingAtStep = savedIsLookingAtStep;
-            seekPos = savedSeekPos;
-            playOnResume = savedPlayOnResume;
-        }else{
-            Intent startingIntent = getIntent();
-            recipe = startingIntent.getParcelableExtra(getString(R.string.recipe_pass_key));
-        }
 
         FragmentManager fragmentManager = getSupportFragmentManager();
+        masterRecipeFragment = new MasterRecipeFragment();
+        stepFragment = new StepFragment();
+        ingredientsFragment = new IngredientsFragment();
 
-        if(fragmentManager.findFragmentByTag(FRAGMENT_STEPS) == null){
+        /*if(fragmentManager.findFragmentByTag(FRAGMENT_STEPS) == null){
             masterRecipeFragment = new MasterRecipeFragment();
         }else{
             masterRecipeFragment = (MasterRecipeFragment) fragmentManager.findFragmentByTag(FRAGMENT_STEPS);
@@ -92,61 +81,21 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
             ingredientsFragment = new IngredientsFragment();
         }else{
             ingredientsFragment = (IngredientsFragment) fragmentManager.findFragmentByTag(FRAGMENT_INGREDIENTS);
-        }
+        }*/
 
-        /*masterRecipeFragment = new MasterRecipeFragment();
-        stepFragment = new StepFragment();
-        ingredientsFragment = new IngredientsFragment();*/
+        //Log.d("naputest", ""+(savedInstanceState == null));
+        if(savedInstanceState != null){
+            Recipe savedRecipe = savedInstanceState.getParcelable(getString(R.string.step_recipe_key_fragment));
+            int savedIndex = savedInstanceState.getInt(getString(R.string.step_index_key_fragment));
+            boolean savedIsLookingAtStep = savedInstanceState.getBoolean(getString(R.string.step_is_on_step_boolean_key_fragment));
+            long savedSeekPos = savedInstanceState.getLong(getString(R.string.step_seek_key_activity));
+            //boolean savedPlayOnResume = savedInstanceState.getBoolean(getString(R.string.step_play_on_resume_fragment));
+            recipe = savedRecipe;
+            stepIndex = savedIndex;
+            isLookingAtStep = savedIsLookingAtStep;
+            seekPos = savedSeekPos;
+            //playOnResume = savedPlayOnResume;
 
-        masterRecipeFragment.setRecipe(recipe);
-        stepFragment.setRecipe(recipe);
-        stepFragment.setStartPos(seekPos);
-        stepFragment.setPlayOnResume(playOnResume);
-        ingredientsFragment.setRecipe(recipe);
-
-        if(fragmentManager.findFragmentByTag(FRAGMENT_STEPS) == null){
-            if(isSplitScreen){
-                fragmentManager.beginTransaction()
-                        .add(masterFragmentContainer.getId(), masterRecipeFragment, FRAGMENT_STEPS)
-                        .commit();
-                if(stepIndex == 0){
-                    fragmentManager.beginTransaction()
-                            .add(stepContainer.getId(), ingredientsFragment, FRAGMENT_INGREDIENTS)
-                            .commit();
-                }else{
-                    stepFragment.setStepIndex(stepIndex);
-                    fragmentManager.beginTransaction()
-                            .replace(stepContainer.getId(), stepFragment, FRAGMENT_STEP)
-                            .commit();
-                }
-            }else{
-                if(!isLookingAtStep) {
-                    fragmentManager.beginTransaction()
-                            .add(masterFragmentContainer.getId(), masterRecipeFragment)
-                            .commit();
-                } else {
-                    if(stepIndex == 0){
-                        fragmentManager.beginTransaction()
-                                .add(masterFragmentContainer.getId(), ingredientsFragment)
-                                .commit();
-                        isLookingAtStep = true;
-                    }else{
-                        stepFragment.setStepIndex(stepIndex);
-                        fragmentManager.beginTransaction()
-                                .add(masterFragmentContainer.getId(), stepFragment)
-                                .commit();
-                        stepFragment.setStartPos(seekPos);
-                        if(isLandscape){
-                            getSupportActionBar().hide();
-                            stepFragment.isFullScreen = true;
-                            View decorView = getWindow().getDecorView();
-                            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-                            decorView.setSystemUiVisibility(uiOptions);
-                        }
-                    }
-                }
-            }
-        }else{
             if(isSplitScreen){
                 fragmentManager.beginTransaction()
                         .replace(masterFragmentContainer.getId(), masterRecipeFragment, FRAGMENT_STEPS)
@@ -164,21 +113,18 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
             }else{
                 if(!isLookingAtStep) {
                     fragmentManager.beginTransaction()
-                            .replace(masterFragmentContainer.getId(), masterRecipeFragment)
+                            .replace(masterFragmentContainer.getId(), masterRecipeFragment, FRAGMENT_STEPS)
                             .commit();
                 } else {
                     if(stepIndex == 0){
-                        //Fragment tempFragment = fragmentManager.findFragmentById(masterFragmentContainer.getId());
-                        //Log.d("naputest", "Fragment is instance of IngredientsFragment: "+(tempFragment instanceof IngredientsFragment));
                         fragmentManager.beginTransaction()
-                                .remove(fragmentManager.findFragmentByTag(FRAGMENT_INGREDIENTS))
-                                .replace(masterFragmentContainer.getId(), ingredientsFragment)
+                                .replace(masterFragmentContainer.getId(), ingredientsFragment, FRAGMENT_INGREDIENTS)
                                 .commit();
                         isLookingAtStep = true;
-                    }/*else{
+                    }else{
                         stepFragment.setStepIndex(stepIndex);
                         fragmentManager.beginTransaction()
-                                .replace(masterFragmentContainer.getId(), stepFragment)
+                                .replace(masterFragmentContainer.getId(), stepFragment, FRAGMENT_STEP)
                                 .commit();
                         stepFragment.setStartPos(seekPos);
                         if(isLandscape){
@@ -188,7 +134,58 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
                             int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
                             decorView.setSystemUiVisibility(uiOptions);
                         }
-                    }*/
+                    }
+                }
+            }
+
+        }else{
+            Intent startingIntent = getIntent();
+            recipe = startingIntent.getParcelableExtra(getString(R.string.recipe_pass_key));
+
+            masterRecipeFragment.setRecipe(recipe);
+            stepFragment.setRecipe(recipe);
+            stepFragment.setStartPos(seekPos);
+            ingredientsFragment.setRecipe(recipe);
+
+            if(isSplitScreen){
+                fragmentManager.beginTransaction()
+                        .replace(masterFragmentContainer.getId(), masterRecipeFragment, FRAGMENT_STEPS)
+                        .commit();
+                if(stepIndex == 0){
+                    fragmentManager.beginTransaction()
+                            .replace(stepContainer.getId(), ingredientsFragment, FRAGMENT_INGREDIENTS)
+                            .commit();
+                }else{
+                    stepFragment.setStepIndex(stepIndex);
+                    fragmentManager.beginTransaction()
+                            .replace(stepContainer.getId(), stepFragment, FRAGMENT_STEP)
+                            .commit();
+                }
+            }else{
+                if(!isLookingAtStep) {
+                    fragmentManager.beginTransaction()
+                            .replace(masterFragmentContainer.getId(), masterRecipeFragment, FRAGMENT_STEPS)
+                            .commit();
+                } else {
+                    if(stepIndex == 0){
+                        fragmentManager.beginTransaction()
+                                .replace(masterFragmentContainer.getId(), ingredientsFragment, FRAGMENT_INGREDIENTS)
+                                .commit();
+                        isLookingAtStep = true;
+                    }else{
+                        stepFragment.setStepIndex(stepIndex);
+                        fragmentManager.beginTransaction()
+                                .replace(masterFragmentContainer.getId(), stepFragment, FRAGMENT_STEP)
+                                .commit();
+                        stepFragment.setStartPos(seekPos);
+                        if(isLandscape){
+                            getSupportActionBar().hide();
+                            stepFragment.isFullScreen = true;
+                            View decorView = getWindow().getDecorView();
+                            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+                            decorView.setSystemUiVisibility(uiOptions);
+                        }
+                    }
                 }
             }
         }
@@ -198,20 +195,23 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
 
     @Override
     public void stepChosen(int stepIndex) {
+        for(int i = 0; i < getSupportFragmentManager().getFragments().size(); i++){
+            Log.d("naputest", "Fragment "+(i+1)+" is "+getSupportFragmentManager().getFragments().get(i).getClass());
+        }
         this.stepIndex = stepIndex;
         if(isSplitScreen){
             if (stepIndex == 0){
                 if(findViewById(R.id.step_details) != null){
                     FragmentManager fragmentManager = getSupportFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(stepContainer.getId(), ingredientsFragment)
+                            .replace(stepContainer.getId(), ingredientsFragment, FRAGMENT_INGREDIENTS)
                             .commit();
                 }
             }else{
                 if(findViewById(R.id.step_details) == null){
                     FragmentManager fragmentManager = getSupportFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(stepContainer.getId(), stepFragment)
+                            .replace(stepContainer.getId(), stepFragment, FRAGMENT_STEP)
                             .commit();
                 }
                 stepFragment.setStepIndex(stepIndex);
@@ -219,29 +219,24 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
         }else if(stepIndex == 0){
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(masterFragmentContainer.getId(), ingredientsFragment)
+                    .replace(masterFragmentContainer.getId(), ingredientsFragment, FRAGMENT_INGREDIENTS)
                     .commit();
             isLookingAtStep = true;
         }else{
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(masterFragmentContainer.getId(), stepFragment)
+                    .replace(masterFragmentContainer.getId(), stepFragment, FRAGMENT_STEP)
                     .commit();
             stepFragment.setStepIndex(stepIndex);
             isLookingAtStep = true;
             stepFragment.setStartPos(seekPos);
-            fragmentManager.beginTransaction()
-                    .replace(masterFragmentContainer.getId(), stepFragment)
-                    .commit();
-            /*Intent intent;
-            if (stepIndex == 0) {
-                intent = new Intent(this, IngredientActivity.class);
-            } else {
-                intent = new Intent(this, StepActivity.class);
+            if(isLandscape){
+                getSupportActionBar().hide();
+                stepFragment.isFullScreen = true;
+                View decorView = getWindow().getDecorView();
+                int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+                decorView.setSystemUiVisibility(uiOptions);
             }
-            intent.putExtra(getString(R.string.recipe_pass_key), recipe);
-            intent.putExtra(getString(R.string.step_number_key), stepIndex - 1);
-            startActivity(intent);*/
         }
     }
 
@@ -255,6 +250,13 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
                     .replace(masterFragmentContainer.getId(), masterRecipeFragment)
                     .commit();
             isLookingAtStep = false;
+            if(isLandscape){
+                getSupportActionBar().show();
+                stepFragment.isFullScreen = false;
+                View decorView = getWindow().getDecorView();
+                int uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
+                decorView.setSystemUiVisibility(uiOptions);
+            }
         }else{
             super.onBackPressed();
         }
@@ -265,9 +267,9 @@ public class RecipeActivity extends AppCompatActivity implements MasterRecipeFra
         super.onSaveInstanceState(outState);
         outState.putParcelable(getString(R.string.step_recipe_key_fragment), recipe);
         outState.putInt(getString(R.string.step_index_key_fragment), stepIndex);
-        outState.putBoolean(getString(R.string.step_is_on_step_boolean_key_fragment), isLookingAtStep);
         outState.putLong(getString(R.string.step_seek_key_activity), seekPos);
-        outState.putBoolean(getString(R.string.step_play_on_resume_fragment), playOnResume);
+        outState.putBoolean(getString(R.string.step_is_on_step_boolean_key_fragment), isLookingAtStep);
+        //outState.putBoolean(getString(R.string.step_play_on_resume_fragment), playOnResume);
     }
 
     @Override
